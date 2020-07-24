@@ -14,18 +14,16 @@ default_args = {
 }
 
 
-def hello_world():
-    print("Hello world")
 
 def parse_response(**context):
     response = context['task_instance'].xcom_pull(task_ids='get_weather')
     return
 
 
-with DAG('hello_world_dag',
+with DAG('weather_bot',
          catchup=False,
          default_args=default_args,
-         schedule_interval='@hourly',
+         schedule_interval='@daily',
          ) as dag:
 
     get_weather = SimpleHttpOperator(
