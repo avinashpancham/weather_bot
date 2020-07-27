@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 import pandas as pd
 
@@ -42,7 +43,7 @@ def get_weather_description(df: pd.DataFrame) -> str:
     )
 
     return "\n".join(
-        "From "
+        "\t - From "
         + df_description["start_hour"]
         + " till "
         + df_description["end_hour"]
@@ -55,13 +56,12 @@ def create_weather_message(
     temperature: float, apparent_temperature: float, rain: str, description: str
 ) -> str:
     return f"""
-Goodmorning,
+Weather forecast Den Haag for {datetime.now().strftime('%d-%m')}
 
-Todays weather forecast for Den Haag is:
 Average temperature: {temperature:.1f} °C
 Average apparent temperature: {apparent_temperature:.1f} °C
 Potential rain: {rain}
-Weather forecast:
+Hourly forecast:
 {description}
 """
 
