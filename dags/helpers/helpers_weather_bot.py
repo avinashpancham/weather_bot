@@ -8,11 +8,13 @@ def kelvin_to_celsius(temperature: float) -> float:
     return temperature - 273.15
 
 
-def get_first_day(df: pd.DataFrame) -> pd.DataFrame:
+def get_first_day(df: pd.DataFrame, timezone_offset: int) -> pd.DataFrame:
     return (
         df.sort_values(by="dt")
         .head(24)
-        .assign(hour=lambda df: pd.to_datetime(df.dt, unit="s").dt.hour)
+        .assign(
+            hour=lambda df: pd.to_datetime(df.dt + timezone_offset, unit="s").dt.hour
+        )
     )
 
 
@@ -86,7 +88,7 @@ def parse_weather_response(**context) -> str:
 
     df_forecast = (
         pd.DataFrame(response["hourly"])
-        .pipe(get_first_day)
+        .pipe(get_first_day, timezone_offset=response["timezone_offset"])
         .pipe(expand_weather_column)
         .drop(columns=redundant_columns)
     )
