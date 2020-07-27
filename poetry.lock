@@ -947,7 +947,6 @@ version = "2.6.1"
 [[package]]
 category = "main"
 description = "JSON Web Token implementation in Python"
-marker = "python_version >= \"3.6\""
 name = "pyjwt"
 optional = false
 python-versions = "*"
@@ -1247,6 +1246,23 @@ version = "0.10.1"
 
 [[package]]
 category = "main"
+description = "Twilio API client and TwiML generator"
+name = "twilio"
+optional = false
+python-versions = "*"
+version = "6.44.1"
+
+[package.dependencies]
+PyJWT = ">=1.4.2"
+pytz = "*"
+six = "*"
+
+[package.dependencies.requests]
+python = ">=3.0"
+version = ">=2.0.0"
+
+[[package]]
+category = "main"
 description = "Backported and Experimental Type Hints for Python 3.5+"
 marker = "python_version < \"3.8\""
 name = "typing-extensions"
@@ -1374,7 +1390,7 @@ docs = ["sphinx"]
 test = ["zope.testrunner"]
 
 [metadata]
-content-hash = "eb176b45812bae511273ea066f4610619b3b6bbc409ac09a122b38b57641eea6"
+content-hash = "7caaeb2bfcc7ab3b40377850164f84b30bde9990e884bf29d6ae1b47c9c7b2ce"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -1870,6 +1886,9 @@ thrift = [
 toml = [
     {file = "toml-0.10.1-py2.py3-none-any.whl", hash = "sha256:bda89d5935c2eac546d648028b9901107a595863cb36bae0c73ac804a9b4ce88"},
     {file = "toml-0.10.1.tar.gz", hash = "sha256:926b612be1e5ce0634a2ca03470f95169cf16f939018233a670519cb4ac58b0f"},
+]
+twilio = [
+    {file = "twilio-6.44.1.tar.gz", hash = "sha256:a84b6a4e8f6c739cf3fa429033ad522d07c78e3788800e68fe5195d83db4f03a"},
 ]
 typing-extensions = [
     {file = "typing_extensions-3.7.4.2-py2-none-any.whl", hash = "sha256:f8d2bd89d25bc39dabe7d23df520442fa1d8969b82544370e03d88b5a591c392"},

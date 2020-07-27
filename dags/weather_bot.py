@@ -1,6 +1,8 @@
 import datetime as dt
 import os
 
+import requests
+import urllib3
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.http_operator import SimpleHttpOperator
@@ -14,6 +16,23 @@ default_args = {
     "concurrency": 1,
     "retries": 0,
 }
+urllib3.disable_warnings()
+headers = urllib3.util.make_headers(
+    basic_auth=f"{os.environ['ACCOUNT_SID']}:{os.environ['AUTH_TOKEN']}"
+)
+
+
+def test_sms(**context):
+    url = f"https://api.twilio.com/2010-04-01/Accounts/{os.environ['ACCOUNT_SID']}/Messages.json"
+    return requests.post(
+        url,
+        auth=(os.environ["ACCOUNT_SID"], os.environ["AUTH_TOKEN"]),
+        data={
+            "To": os.environ["TO_PHONE_NUMBER"],
+            "From": os.environ["FROM_PHONE_NUMBER"],
+            "Body": "sms with Python Operator",
+        },
+    )
 
 
 with DAG(
@@ -38,4 +57,28 @@ with DAG(
         do_xcom_push=True,
     )
 
-get_weather >> parse_response
+    send_sms = SimpleHttpOperator(
+        task_id="send_sms",
+        method="POST",
+        http_conn_id="sms",
+        endpoint=f"2010-04-01/Accounts/{os.environ['ACCOUNT_SID']}/Messages.json",
+        headers=headers,
+        data={
+            "To": os.environ["TO_PHONE_NUMBER"],
+            "From": os.environ["FROM_PHONE_NUMBER"],
+            "Body": "sms with HTTP Operator",
+        },
+        xcom_push=True,
+        response_check=lambda response: response.ok,
+        dag=dag,
+    )
+
+    # send_sms = PythonOperator(
+    #     task_id="send_sms",
+    #     python_callable=test_sms,
+    #     provide_context=True,
+    #     do_xcom_push=True,
+    # )
+
+
+get_weather >> parse_response >> send_sms
