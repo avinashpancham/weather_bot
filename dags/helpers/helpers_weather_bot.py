@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 import pandas as pd
 
@@ -7,11 +8,13 @@ def kelvin_to_celsius(temperature: float) -> float:
     return temperature - 273.15
 
 
-def get_first_day(df: pd.DataFrame) -> pd.DataFrame:
+def get_first_day(df: pd.DataFrame, timezone_offset: int) -> pd.DataFrame:
     return (
         df.sort_values(by="dt")
         .head(24)
-        .assign(hour=lambda df: pd.to_datetime(df.dt, unit="s").dt.hour)
+        .assign(
+            hour=lambda df: pd.to_datetime(df.dt + timezone_offset, unit="s").dt.hour
+        )
     )
 
 
@@ -42,7 +45,7 @@ def get_weather_description(df: pd.DataFrame) -> str:
     )
 
     return "\n".join(
-        "From "
+        "\t - From "
         + df_description["start_hour"]
         + " till "
         + df_description["end_hour"]
@@ -55,13 +58,12 @@ def create_weather_message(
     temperature: float, apparent_temperature: float, rain: str, description: str
 ) -> str:
     return f"""
-Goodmorning,
+Weather forecast Den Haag for {datetime.now().strftime('%d-%m')}
 
-Todays weather forecast for Den Haag is:
 Average temperature: {temperature:.1f} °C
 Average apparent temperature: {apparent_temperature:.1f} °C
 Potential rain: {rain}
-Weather forecast:
+Hourly forecast:
 {description}
 """
 
@@ -86,7 +88,7 @@ def parse_weather_response(**context) -> str:
 
     df_forecast = (
         pd.DataFrame(response["hourly"])
-        .pipe(get_first_day)
+        .pipe(get_first_day, timezone_offset=response["timezone_offset"])
         .pipe(expand_weather_column)
         .drop(columns=redundant_columns)
     )

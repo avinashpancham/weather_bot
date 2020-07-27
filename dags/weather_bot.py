@@ -62,23 +62,13 @@ with DAG(
         method="POST",
         http_conn_id="sms",
         endpoint=f"2010-04-01/Accounts/{os.environ['ACCOUNT_SID']}/Messages.json",
-        headers=headers,
         data={
             "To": os.environ["TO_PHONE_NUMBER"],
             "From": os.environ["FROM_PHONE_NUMBER"],
-            "Body": "sms with HTTP Operator",
+            "Body": "{{ task_instance.xcom_pull(task_ids='parse_response')}}",
         },
-        xcom_push=True,
         response_check=lambda response: response.ok,
         dag=dag,
     )
-
-    # send_sms = PythonOperator(
-    #     task_id="send_sms",
-    #     python_callable=test_sms,
-    #     provide_context=True,
-    #     do_xcom_push=True,
-    # )
-
 
 get_weather >> parse_response >> send_sms
