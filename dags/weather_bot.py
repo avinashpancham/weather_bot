@@ -16,7 +16,10 @@ default_args = {
 }
 
 with DAG(
-    "weather_bot", catchup=False, default_args=default_args, schedule_interval="@daily",
+    "weather_bot",
+    catchup=False,
+    default_args=default_args,
+    schedule_interval="0 7 * * 1-5",
 ) as dag:
 
     get_weather = SimpleHttpOperator(
