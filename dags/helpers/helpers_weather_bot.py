@@ -27,7 +27,7 @@ def get_weather_metrics(df: pd.DataFrame) -> (float, float, str):
     return (
         kelvin_to_celsius(df.temp.mean()),
         kelvin_to_celsius(df.feels_like.mean()),
-        "Yes" if df.rain.notnull().any() else "No",
+        "Yes" if "rain" in df else "No",
     )
 
 
