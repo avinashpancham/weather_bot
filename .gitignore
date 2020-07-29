@@ -140,6 +140,8 @@ cython_debug/
 # Custom
 *.db
 .DS_Store
+airflow-webserver.pid
 .idea/
 .envrc
 logs/
+data/
