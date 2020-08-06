@@ -4,10 +4,6 @@ from datetime import datetime
 import pandas as pd
 
 
-def kelvin_to_celsius(temperature: float) -> float:
-    return temperature - 273.15
-
-
 def get_first_day(df: pd.DataFrame, timezone_offset: int) -> pd.DataFrame:
     return (
         df.sort_values(by="dt")
@@ -25,8 +21,8 @@ def expand_weather_column(df: pd.DataFrame) -> pd.DataFrame:
 
 def get_weather_metrics(df: pd.DataFrame) -> (float, float, str):
     return (
-        kelvin_to_celsius(df.temp.mean()),
-        kelvin_to_celsius(df.feels_like.mean()),
+        df.temp.mean(),
+        df.feels_like.mean(),
         "Yes" if "rain" in df else "No",
     )
 

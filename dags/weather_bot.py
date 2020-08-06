@@ -26,7 +26,7 @@ with DAG(
         task_id="get_weather",
         method="POST",
         http_conn_id="weather",
-        endpoint="data/2.5/onecall?lat=52.066669&lon=4.3&exclude=current,daily",
+        endpoint="data/2.5/onecall?lat=52.066669&lon=4.3&exclude=current,daily&units=metric",
         headers={"x-api-key": get_secret_from_file("OPEN_WEATHER_API_KEY_FILE")},
         xcom_push=True,
         response_check=lambda response: response.ok,
