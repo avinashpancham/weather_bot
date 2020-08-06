@@ -12,5 +12,6 @@ COPY --chown=airflow:root wait-for-it.sh wait-for-it.sh
 RUN chmod +x wait-for-it.sh
 
 ENTRYPOINT []
-CMD ["sh", "-c", "airflow connections --add --conn_id 'sms' --conn_uri $$(cat /run/secrets/TWILIO_ENDPOINT) \
+CMD ["sh", "-c", "airflow upgradedb \
+     && airflow connections --add --conn_id 'sms' --conn_uri $(cat $TWILIO_ENDPOINT_FILE) \
      && airflow scheduler"]
