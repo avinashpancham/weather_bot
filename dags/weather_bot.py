@@ -1,10 +1,10 @@
 import datetime as dt
-import os
 
 from airflow import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.http_operator import SimpleHttpOperator
 
+from helpers.general import get_secret_from_file
 from helpers.helpers_weather_bot import parse_weather_response
 
 
@@ -27,7 +27,7 @@ with DAG(
         method="POST",
         http_conn_id="weather",
         endpoint="data/2.5/onecall?lat=52.066669&lon=4.3&exclude=current,daily",
-        headers={"x-api-key": os.environ["OPEN_WEATHER_API_KEY"]},
+        headers={"x-api-key": get_secret_from_file("OPEN_WEATHER_API_KEY_FILE")},
         xcom_push=True,
         response_check=lambda response: response.ok,
         dag=dag,
@@ -44,10 +44,10 @@ with DAG(
         task_id="send_sms",
         method="POST",
         http_conn_id="sms",
-        endpoint=f"2010-04-01/Accounts/{os.environ['ACCOUNT_SID']}/Messages.json",
+        endpoint=f"2010-04-01/Accounts/{get_secret_from_file('ACCOUNT_SID_FILE')}/Messages.json",
         data={
-            "To": os.environ["TO_PHONE_NUMBER"],
-            "From": os.environ["FROM_PHONE_NUMBER"],
+            "To": get_secret_from_file("TO_PHONE_NUMBER_FILE"),
+            "From": get_secret_from_file("FROM_PHONE_NUMBER_FILE"),
             "Body": "{{ task_instance.xcom_pull(task_ids='parse_response')}}",
         },
         response_check=lambda response: response.ok,
