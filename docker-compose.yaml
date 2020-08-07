@@ -26,7 +26,8 @@ services:
     entrypoint: []
     command: ["sh", "-c", "./wait-for-it.sh -t 60 db:5432 -- \
      airflow initdb \
-     && airflow connections --add --conn_id 'twilio' --conn_uri $$(cat $$TWILIO_ENDPOINT_FILE) \
+     && airflow connections --add --conn_id 'twilio' \
+     --conn_uri http://$$(cat $$TWILIO_ACCOUNT_SID_FILE):$$(cat $$TWILIO_AUTH_TOKEN_FILE)@https%3A%2F%2Fapi.twilio.com \
      && airflow unpause weather_bot \
      && airflow scheduler"]
     ports:
@@ -39,7 +40,7 @@ services:
       POSTGRES_PASSWORD_FILE: /run/secrets/POSTGRES_PASSWORD
       POSTGRES_USER_FILE: /run/secrets/POSTGRES_USER
       TWILIO_ACCOUNT_SID_FILE: /run/secrets/TWILIO_ACCOUNT_SID
-      TWILIO_ENDPOINT_FILE: /run/secrets/TWILIO_ENDPOINT
+      TWILIO_AUTH_TOKEN_FILE: /run/secrets/TWILIO_AUTH_TOKEN
       TWILIO_PHONE_NUMBER_FILE: /run/secrets/TWILIO_PHONE_NUMBER
     volumes:
     - "./data/logs:/opt/airflow/logs"
@@ -50,7 +51,7 @@ services:
       - POSTGRES_PASSWORD
       - POSTGRES_USER
       - TWILIO_ACCOUNT_SID
-      - TWILIO_ENDPOINT
+      - TWILIO_AUTH_TOKEN
       - TWILIO_PHONE_NUMBER
 
 secrets:
@@ -66,7 +67,7 @@ secrets:
     file: secrets/POSTGRES_USER.txt
   TWILIO_ACCOUNT_SID:
     file: secrets/TWILIO_ACCOUNT_SID.txt
-  TWILIO_ENDPOINT:
-    file: secrets/TWILIO_ENDPOINT.txt
+  TWILIO_AUTH_TOKEN:
+    file: secrets/TWILIO_AUTH_TOKEN.txt
   TWILIO_PHONE_NUMBER:
     file: secrets/TWILIO_PHONE_NUMBER.txt
