@@ -25,9 +25,9 @@ with DAG(
     get_weather = SimpleHttpOperator(
         task_id="get_weather",
         method="POST",
-        http_conn_id="weather",
-        endpoint="data/2.5/onecall?lat=52.066669&lon=4.3&exclude=current,daily",
-        headers={"x-api-key": get_secret_from_file("OPEN_WEATHER_API_KEY_FILE")},
+        http_conn_id="open_weather_map",
+        endpoint="data/2.5/onecall?lat=52.066669&lon=4.3&exclude=current,daily&units=metric",
+        headers={"x-api-key": get_secret_from_file("OPEN_WEATHER_MAP_API_KEY_FILE")},
         xcom_push=True,
         response_check=lambda response: response.ok,
         dag=dag,
@@ -43,11 +43,11 @@ with DAG(
     send_sms = SimpleHttpOperator(
         task_id="send_sms",
         method="POST",
-        http_conn_id="sms",
-        endpoint=f"2010-04-01/Accounts/{get_secret_from_file('ACCOUNT_SID_FILE')}/Messages.json",
+        http_conn_id="twilio",
+        endpoint=f"2010-04-01/Accounts/{get_secret_from_file('TWILIO_ACCOUNT_SID_FILE')}/Messages.json",
         data={
-            "To": get_secret_from_file("TO_PHONE_NUMBER_FILE"),
-            "From": get_secret_from_file("FROM_PHONE_NUMBER_FILE"),
+            "To": get_secret_from_file("PERSONAL_PHONE_NUMBER_FILE"),
+            "From": get_secret_from_file("TWILIO_PHONE_NUMBER_FILE"),
             "Body": "{{ task_instance.xcom_pull(task_ids='parse_response')}}",
         },
         response_check=lambda response: response.ok,
