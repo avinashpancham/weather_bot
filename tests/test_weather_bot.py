@@ -1,4 +1,4 @@
-from supersonic import __version__
+from weather_bot import __version__
 
 
 def test_version():
