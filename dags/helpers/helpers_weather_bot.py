@@ -1,7 +1,15 @@
 import json
+import os
 from datetime import datetime
 
 import pandas as pd
+
+
+def get_lat_lon() -> pd.Series:
+    city, country = [address.strip() for address in os.environ['LOCATION'].split(',')]
+    df = pd.read_csv('dags/data/worldcities.csv', usecols=['iso2', 'country', 'city', 'lat', 'lng']).query(f"iso2=='{country}' and city=='{city}'")
+    assert len(df) == 1, 'Provided location is either not found or ambiguous'
+    return df.iloc[0]
 
 
 def get_first_day(df: pd.DataFrame, timezone_offset: int) -> pd.DataFrame:
@@ -51,10 +59,10 @@ def get_weather_description(df: pd.DataFrame) -> str:
 
 
 def create_weather_message(
-    temperature: float, apparent_temperature: float, rain: str, description: str
+    city: str, temperature: float, apparent_temperature: float, rain: str, description: str
 ) -> str:
     return f"""
-Weather forecast Den Haag for {datetime.now().strftime('%d-%m')}
+Weather forecast {city} for {datetime.now().strftime('%d-%m')}
 
 Average temperature: {temperature:.1f} °C
 Average apparent temperature: {apparent_temperature:.1f} °C
@@ -64,7 +72,7 @@ Hourly forecast:
 """
 
 
-def parse_weather_response(**context) -> str:
+def parse_weather_response(city: str, **context) -> str:
     response = json.loads(context["task_instance"].xcom_pull(task_ids="get_weather"))
     redundant_columns = [
         "dt",
@@ -93,6 +101,7 @@ def parse_weather_response(**context) -> str:
     weather_description = get_weather_description(df=df_forecast)
 
     return create_weather_message(
+        city=city,
         temperature=temperature,
         apparent_temperature=apparent_temperature,
         rain=rain,
