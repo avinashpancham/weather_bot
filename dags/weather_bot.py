@@ -5,8 +5,7 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.operators.http_operator import SimpleHttpOperator
 
 from helpers.general import get_secret_from_file
-from helpers.helpers_weather_bot import parse_weather_response
-
+from helpers.helpers_weather_bot import parse_weather_response, get_lat_lon
 
 default_args = {
     "owner": "me",
@@ -14,6 +13,8 @@ default_args = {
     "concurrency": 1,
     "retries": 0,
 }
+
+location = get_lat_lon()
 
 with DAG(
     "weather_bot",
@@ -26,7 +27,7 @@ with DAG(
         task_id="get_weather",
         method="POST",
         http_conn_id="open_weather_map",
-        endpoint="data/2.5/onecall?lat=52.066669&lon=4.3&exclude=current,daily&units=metric",
+        endpoint=f"data/2.5/onecall?lat={location.lat}&lon={location.lng}&exclude=current,daily&units=metric",
         headers={"x-api-key": get_secret_from_file("OPEN_WEATHER_MAP_API_KEY_FILE")},
         xcom_push=True,
         response_check=lambda response: response.ok,
@@ -36,6 +37,7 @@ with DAG(
     parse_response = PythonOperator(
         task_id="parse_response",
         python_callable=parse_weather_response,
+        op_kwargs={'city': location.city},
         provide_context=True,
         do_xcom_push=True,
     )
