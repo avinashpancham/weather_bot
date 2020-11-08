@@ -22,13 +22,6 @@ services:
     image: airflow_server
     depends_on:
       - db
-    entrypoint: []
-    command: ["sh", "-c", "./wait-for-it.sh -t 60 db:5432 -- \
-     airflow initdb \
-     && airflow connections --add --conn_id 'twilio' \
-     --conn_uri http://$$(cat $$TWILIO_ACCOUNT_SID_FILE):$$(cat $$TWILIO_AUTH_TOKEN_FILE)@https%3A%2F%2Fapi.twilio.com \
-     && airflow unpause weather_bot \
-     && airflow scheduler"]
     ports:
       - "8080:8080"
     environment:
@@ -44,6 +37,7 @@ services:
       TWILIO_PHONE_NUMBER_FILE: /run/secrets/TWILIO_PHONE_NUMBER
     volumes:
     - "./data/logs:/opt/airflow/logs"
+    - "./data/supervisor:/opt/airflow/supervisor"
     secrets:
       - OPEN_WEATHER_MAP_API_KEY
       - PERSONAL_PHONE_NUMBER

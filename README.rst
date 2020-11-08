@@ -101,3 +101,4 @@ Once the setup is completed we can launch the weatherbot.
    $ docker-compose up --build
 
 The first time a text message will be sent immediately, but all subsequent messages will be sent on weekdays at 7 am.
+To view the airflow UI visit http://localhost:8080/admin/.
