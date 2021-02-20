@@ -1,0 +1,5 @@
+*
+!dags/*
+!airflow.cfg
+!supervisord.conf
+!dependencies/*
